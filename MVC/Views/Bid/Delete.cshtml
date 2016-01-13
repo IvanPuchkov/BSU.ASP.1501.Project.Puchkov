@@ -1,0 +1,52 @@
+﻿@model MVC.Models.BidViewModel
+@{
+    ViewBag.Title = "Delete bid";
+}
+
+<h2>Are you sure you want to Delete this bid?</h2>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(x => x.User.DisplayName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(x => x.User.DisplayName)
+        </dd>
+
+        <dt>
+            @Html.DisplayName("Lot Name")
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(x => x.Lot.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(x => x.Amount)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(x => x.Amount)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(x => x.Placed)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(x => x.Placed)
+        </dd>
+    </dl>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" />
+            <br />
+            @Html.ActionLink("To the list of bids", "Index")
+        </div>
+    }
+</div>

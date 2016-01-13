@@ -1,0 +1,144 @@
+﻿@model MVC.Models.LotViewModel
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>@Model.Name</h2>
+@if ((!Model.LotClosed) && (!Model.LotEnded))
+{
+    if (ViewBag.IsAdminOrModerator)
+    {
+        @Html.ActionLink("Close Lot", "Close", new { id = Model.Id })
+        <br/>
+        @Html.ActionLink("End Lot", "End", new { id = Model.Id })
+        <br/>
+        @Html.ActionLink("Delete Lot", "Delete", new {id = Model.Id})
+        <br/>
+    }
+    if (ViewBag.SamePerson || ViewBag.IsAdminOrModerator)
+    {
+        @Html.ActionLink("Update Lot information", "Update", new {id = Model.Id})
+    }
+}
+else
+{
+    if (Model.LotClosed)
+    {
+        <h2><span style="color: red;">Lot was closed by site Administration</span></h2>
+    }
+    else
+    {
+        <h2><span style="color: red;">Lot has ended</span></h2>
+    }
+}
+<div class="container">
+    <div style="width: 40%; float: left">
+        <img src="@Url.Action("GetImage", "Lot", new {lotId = Model.Id, isPreview = false})"/>
+    </div>
+    <div style="width: 60%; float: left">
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(x => x.Name)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayName("Created by")
+            </dt>
+
+            <dd>
+                @Html.ActionLink(Model.CreatedByUser.DisplayName, "Details", new {userId = Model.CreatedByUser.Id, controller = "Users"})
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(x => x.LotDescription)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.LotDescription)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(x => x.MinimalBid)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.MinimalBid)
+            </dd>
+
+            <dt>
+                @Html.DisplayName("Current bid")
+            </dt>
+
+            <dd>
+                @Html.Raw(ViewBag.TopBid)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(x => x.BuyOutBid)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.BuyOutBid)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(x => x.EndDate)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.EndDate)
+            </dd>
+            @if ((!ViewBag.SamePerson) && (ViewBag.AutorizedAndNotBanned)&& (!Model.LotClosed)&&(!Model.LotEnded))
+            {
+                <dt>
+                    Place Bid
+                </dt>
+                <dd>
+                    @Html.ActionLink("Place Bid", "Create", new { Id = Model.Id, controller = "Bid" })
+                </dd>
+            }
+        </dl>
+    </div>
+</div>
+@if (ViewBag.TopBid > 0m)
+{
+    @Html.DisplayName("Latest bids")
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayName("User name")
+            </th>
+            <th>
+                @Html.DisplayName("Amount")
+            </th>
+            <th>
+                @Html.DisplayName("Placed")
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model.LatestBids)
+        {
+            <tr>
+                <td>
+                    @Html.ActionLink(item.User.DisplayName, "Details", new { userId = item.User.Id, controller = "Users" })
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Amount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Placed)
+                </td>
+                <td>
+                    @if (ViewBag.IsAdminOrModerator&&(!(Model.LotClosed||Model.LotEnded)))
+                    {
+                        @Html.ActionLink("Delete", "Delete", new { id = item.Id, controller="Bid" })
+                    }
+                </td>
+            </tr>
+        }
+
+    </table>
+}
+

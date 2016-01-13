@@ -1,0 +1,9 @@
+﻿@model MVC.Models.UserViewModel
+@if (Model != null)
+{
+    <span style="color:white">Greetings, @Html.ActionLink(Model.DisplayName, "Details", new { userId = Model.Id, controller = "Users" }) (@Html.ActionLink("Logout", "Logout", "Account"))</span>
+}
+else
+{
+    <span style="color:white">Greetings, Guest (@Html.ActionLink("Login", "Login", "Account"), @Html.ActionLink("Register", "Register", "Account"))</span>
+}

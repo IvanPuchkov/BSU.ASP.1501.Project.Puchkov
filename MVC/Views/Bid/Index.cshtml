@@ -1,0 +1,66 @@
+﻿@model IEnumerable<MVC.Models.BidViewModel>
+@{
+    ViewBag.Title = "Index";
+}
+
+<table class="table">
+    <tr>
+        
+        <th>
+            @Html.DisplayName("Bid ID")
+        </th>
+        <th>
+            @Html.DisplayName("Lot Id")
+        </th>
+        <th>
+            @Html.DisplayName("Lot Name")
+        </th>
+
+        <th>
+            @Html.DisplayName("Bid Placed By UserId")
+        </th>
+        <th>
+            @Html.DisplayName("Bid Placed By User Disply Name")
+        </th>
+        <th>
+            @Html.DisplayName("Amount placed")
+        </th>
+        <th>
+            @Html.DisplayName("Placed date")
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var bid in Model)
+    {
+        <tr>
+           <td>
+                @Html.DisplayFor(modelItem => bid.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => bid.LotId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => bid.Lot.Name)
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => bid.UserId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => bid.User.DisplayName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => bid.Amount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => bid.Placed)
+            </td>
+            <td>
+                    @Html.ActionLink("Delete", "Delete", new { id = bid.Id })
+            </td>
+        </tr>
+    }
+
+</table>
+

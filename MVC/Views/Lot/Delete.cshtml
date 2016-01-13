@@ -1,0 +1,45 @@
+﻿@model MVC.Models.LotViewModel
+@{
+    ViewBag.Title = "Delete lot";
+}
+
+<h2>Are you sure you want to Delete this lot?</h2>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(x=>x.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(x => x.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(x => x.LotDescription)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(x => x.LotDescription)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(x => x.CreatedByUser)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(x => x.CreatedByUser.DisplayName)
+        </dd>
+    </dl>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default"/>
+            <br/>
+            @Html.ActionLink("To the list of lots", "Index")
+        </div>
+    }
+</div>

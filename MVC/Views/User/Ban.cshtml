@@ -1,0 +1,47 @@
+﻿@model MVC.Models.UserViewModel
+@{
+    ViewBag.Title = "Ban user";
+}
+<h2>Are you sure you want to ban this user?</h2>
+<div>
+<hr />
+<dl class="dl-horizontal">
+    <dt>
+        @Html.DisplayNameFor(x => x.Id)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(x => x.Id)
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(x => x.DisplayName)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(x => x.DisplayName)
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(x => x.Email)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(x => x.Email)
+    </dd>
+</dl>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-actions no-color">
+        <input type="submit" value="Ban" class="btn btn-default" />
+        <br />
+        @Html.ActionLink("To the list of users", "Index")
+    </div>
+}
+</div>
+
+
+
