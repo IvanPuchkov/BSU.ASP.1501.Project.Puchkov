@@ -7,6 +7,7 @@ using System.Web.Helpers;
 using System.Web.Mvc;
 using BLL.Interface.Entities;
 using BLL.Interface.Services;
+using MVC.Infrastructure;
 using MVC.Infrastructure.Mappers;
 using MVC.Models;
 
@@ -83,12 +84,8 @@ namespace MVC.Controllers
                     lots = _lotService.GetLotsContainingStringInDescription(search.SearchString);
                 }
             }
-            var pager=new CustomPagerViewModel<LotViewModel>();
-            pager.CurrentPage = actualPage;
-            int count = lots.Count();
-            int numberOfPages = count/ItemsPerPage;
-            pager.NumberOfPages = count%ItemsPerPage==0?numberOfPages:numberOfPages+1;
-            pager.Data=lots.Skip((actualPage - 1) * ItemsPerPage).Take(ItemsPerPage).Select(x => x.ToLotViewModel());
+            var pager=PagerViewModelCreator<LotViewModel>.GetPagerViewModel(lots.Select(x => x.ToLotViewModel()), actualPage,
+                ItemsPerPage);
             ViewBag.SearchString = search?.SearchString;
             ViewBag.SearchInName = search?.SearchInName ?? true;
             return PartialView(pager);
