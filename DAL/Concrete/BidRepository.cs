@@ -30,7 +30,7 @@ namespace DAL.Concrete
         {
             var ormBid = _context.Set<Bid>().FirstOrDefault(bid => bid.Id == key);
 
-            return ormBid.ToDalBid();
+            return ormBid?.ToDalBid();
         }
 
         public void DeleteAllBidsMadeByUserId(int userId)
@@ -46,7 +46,9 @@ namespace DAL.Concrete
         public void Create(DalBid e)
         {
             var x = e.ToOrmBid();
+            
             _context.Set<Bid>().Add(x);
+            _context.Entry(x).State=EntityState.Added;
         }
 
         public void Delete(DalBid e)

@@ -1,0 +1,60 @@
+﻿@model MVC.Models.CustomPagerViewModel<MVC.Models.BidViewModel>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayName("Lot Name")
+        </th>
+        <th>
+            @Html.DisplayName("Amount")
+        </th>
+        <th>
+            @Html.DisplayName("Placed")
+        </th>
+        <th>
+            @Html.DisplayName("Lot still active")
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var bid in Model.Data)
+    {
+        <tr id="@bid.Id">
+            <td>
+                @Html.ActionLink(bid.Lot.Name, "Details", new {id = bid.Lot.Id, controller = "Lot"})
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => bid.Amount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => bid.Placed)
+            </td>
+            <td>
+                @(bid.Lot.LotClosed || bid.Lot.LotEnded ? "No" : "Yes")
+            </td>
+            @if (ViewBag.AdminOrModerator)
+            {
+                if (!(bid.Lot.LotClosed || bid.Lot.LotEnded))
+                {
+                    <td>
+                        @Ajax.ActionLink("Remove", "Delete", "Bid", new {id = bid.Id}, new AjaxOptions() {Confirm = "Are you sure you want to delete this bid? (This action is irreversible!)", OnSuccess = "RemoveRowById('" + bid.Id + "')"})
+                    </td>
+                }
+            }
+        </tr>
+    }
+    <tr>
+        <td>
+            @for (int i = 1; i <= Model.NumberOfPages; i++)
+            {
+                if (i != Model.CurrentPage)
+                {
+                    @Ajax.ActionLink(i.ToString() + ' ', "GetBids", "Users", new { id = ViewBag.Id, page = i }, new AjaxOptions() { UpdateTargetId = "additional-info" });
+                }
+                else
+                {
+                    <span><b>@i</b></span>
+                }
+            }
+        </td>
+    </tr>
+</table>

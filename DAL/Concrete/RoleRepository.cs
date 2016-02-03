@@ -29,7 +29,7 @@ namespace DAL.Concrete
         {
             var ormRole = _context.Set<Role>().FirstOrDefault(lot => lot.Id == key);
 
-            return ormRole.ToDalRole();
+            return ormRole?.ToDalRole();
         }
 
         public void Create(DalRole e)
@@ -54,7 +54,7 @@ namespace DAL.Concrete
         public DalRole GetRoleByName(string name)
         {
             var ormRole = _context.Set<Role>().FirstOrDefault(lot => lot.UserRoleName == name);
-            return ormRole.ToDalRole();
+            return ormRole?.ToDalRole();
         }
     }
 }

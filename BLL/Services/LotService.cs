@@ -26,7 +26,7 @@ namespace BLL.Services
 
         public LotEntity GetLotEntity(int id)
         {
-            return _lotRepository.GetById(id).ToBllLotEntity();
+            return _lotRepository.GetById(id)?.ToBllLotEntity();
         }
 
         public void CreateLot(LotEntity lot)

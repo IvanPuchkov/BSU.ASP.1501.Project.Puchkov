@@ -11,8 +11,8 @@ namespace ICustomAuthentication
     public interface ICustomAuthentication
     {
         void LogOut(HttpContext context);
-        bool LoginWithDisplayName(HttpContext context, string displayName, string password);
-        bool LoginWithEmail(HttpContext context, string email, string password);
+        bool LoginWithDisplayName(HttpContext context, string displayName, string password, bool isPersistent);
+        bool LoginWithEmail(HttpContext context, string email, string password, bool isPersistent);
         UserEntity CheckAuthentication(HttpRequestBase request);
         bool CheckUserInRoles(UserEntity user, string roles);
     }

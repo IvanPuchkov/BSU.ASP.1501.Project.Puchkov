@@ -69,11 +69,11 @@ namespace MVC.Controllers
             if (ModelState.IsValid)
             {
                 bool result = false;
-                result = _customAuthentication.LoginWithDisplayName(System.Web.HttpContext.Current, login.Email, login.Password);
+                result = _customAuthentication.LoginWithDisplayName(System.Web.HttpContext.Current, login.Email, login.Password,login.RememberMe);
                 if(result)
                     return RedirectToAction("Index","Home");
                 result = _customAuthentication.LoginWithEmail(System.Web.HttpContext.Current, login.Email,
-                    login.Password);
+                    login.Password,login.RememberMe);
                 if(result)
                     return RedirectToAction("Index", "Home");
                 ModelState.AddModelError(string.Empty,"Can't login with specified information");

@@ -30,7 +30,7 @@ namespace BLL.Services
 
         public UserEntity GetUserEntity(int id)
         {
-            return _userRepository.GetById(id).ToBllUserEntity();
+            return _userRepository.GetById(id)?.ToBllUserEntity();
         }
 
         public void DeleteUser(UserEntity user)

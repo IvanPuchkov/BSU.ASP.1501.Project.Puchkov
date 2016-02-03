@@ -23,19 +23,28 @@ namespace DAL.Concrete
 
         public void Commit()
         {
-            try
+            bool concurrencySaveFail = false;
+            do
             {
-                Context?.SaveChanges();
-            }
-            catch(DbUpdateException ex)
-            {
-                SqlException baseException = ex.GetBaseException() as SqlException;
-                if (baseException?.Number == 50000)
+                try
                 {
-                    throw new DalBidTooLowException();
+                    Context?.SaveChanges();
                 }
-                throw;
-            }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    concurrencySaveFail = true;
+                    ex.Entries.Single().Reload();
+                }
+                catch (DbUpdateException ex)
+                {
+                    SqlException baseException = ex.GetBaseException() as SqlException;
+                    if (baseException?.Number == 50000)
+                    {
+                        throw new DalBidTooLowException();
+                    }
+                    throw;
+                }
+            } while (concurrencySaveFail);
         }
 
         public void Dispose()

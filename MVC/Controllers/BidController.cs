@@ -66,20 +66,31 @@ namespace MVC.Controllers
                 return new HttpStatusCodeResult(401);
             if(UserViewModel.Banned)
                 return new HttpStatusCodeResult(403);
+            var ajaxRequest = Request.IsAjaxRequest();
             if (ModelState.IsValid)
             {
-                bid.LotId = bid.Id;
+                
+                if (!ajaxRequest)
+                    bid.LotId = bid.Id;
                 var lot = _lotService.GetLotEntity(bid.LotId);
-                if(lot==null)
-                    return new HttpStatusCodeResult(400);
+                if (lot == null)
+                {
+                    if (ajaxRequest)
+                        return new HttpStatusCodeResult(404, "Something went wrong with your request. Please try again later.");
+                    return new HttpStatusCodeResult(404);
+                }
                 if ((lot.LotClosed) || (lot.LotEnded))
                 {
+                    if (ajaxRequest)
+                        return new HttpStatusCodeResult(422, "You can't place bids on closed or ended lot");
                     ModelState.AddModelError(string.Empty,"You can't place bids on closed or ended lot");
                     return View(bid);
                 }
                 if (bid.Amount < lot.MinimalBet)
                 {
-                    ModelState.AddModelError(string.Empty, "Your bid's amount can't be less than Minimal Bet Amount");
+                    if (ajaxRequest)
+                        return new HttpStatusCodeResult(422, "Your bid's amount can't be less than Minimal Bid Amount (starting bid)");
+                    ModelState.AddModelError(string.Empty, "Your bid's amount can't be less than Minimal Bid Amount (starting bid)");
                     return View(bid);
                 }
                 bid.Placed=DateTime.Now;
@@ -91,12 +102,23 @@ namespace MVC.Controllers
                 }
                 catch (BllBidTooLowException)
                 {
-                    ModelState.AddModelError(string.Empty, "Your bid's amount too low. (There is already a bid with higher amount");
+                    if(ajaxRequest)
+                        return new HttpStatusCodeResult(422, "Your bid's amount too low. (There is already a bid with higher amount)");
+                    ModelState.AddModelError(string.Empty, "Your bid's amount too low. (There is already a bid with higher amount)");
                     return View(bid);
                 }
+                if(ajaxRequest)
+                    return Content("");
                 return RedirectToAction("Details", "Lot", new { id = lot.Id });
             }
+            if (ajaxRequest)
+                return new HttpStatusCodeResult(422, "Incorrect data!");
             return View(bid);
+        }
+
+        private void DeleteEntity(BidEntity bid)
+        {
+            _bidService.DeleteBid(bid);
         }
 
         public ActionResult Delete(int? id)
@@ -104,12 +126,17 @@ namespace MVC.Controllers
             if (!id.HasValue)
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             if (UserViewModel == null)
-                return RedirectToAction("Index");
+                return RedirectToAction("Index","Home");
             if (!_customAuthentication.CheckUserInRoles(UserViewModel.ToUserEntity(), "Admin,Moderator"))
                 return new HttpStatusCodeResult(403);
             var bid = _bidService.GetBidById(id.Value);
             if (bid == null)
                 return HttpNotFound();
+            if (Request.IsAjaxRequest())
+            {
+                DeleteEntity(bid);
+                return Content("");
+            }
             return View(bid.ToBidViewModel());
         }
 
@@ -119,8 +146,8 @@ namespace MVC.Controllers
         {
             if (!_customAuthentication.CheckUserInRoles(UserViewModel.ToUserEntity(), "Admin,Moderator"))
                 return new HttpStatusCodeResult(403);
-             var bid = _bidService.GetBidById(id);
-            _bidService.DeleteBid(bid);
+            var bid = _bidService.GetBidById(id);
+            DeleteEntity(bid);
             return RedirectToAction("Index");
         }
     }

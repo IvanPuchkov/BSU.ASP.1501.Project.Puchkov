@@ -1,0 +1,8 @@
+﻿@model MVC.Models.UserViewModel
+@{
+    ViewBag.Title = Model.DisplayName;
+}
+@Html.Partial("DetailsPartialView",Model)
+@Scripts.Render("~/scripts/jquery-1.10.2.min")
+@Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
+@Scripts.Render("~/scripts/CustomRowRemover.js")

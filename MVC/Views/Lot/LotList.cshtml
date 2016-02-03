@@ -1,0 +1,71 @@
+﻿@using MVC.Models
+@model CustomPagerViewModel<LotViewModel>
+<table class="table">
+    <thead>
+    <tr>
+         <th>
+            @Html.DisplayName("Lot Preview Image")
+        </th>
+
+        <th>
+            @Html.DisplayName("Lot Name")
+        </th>
+
+        <th>
+            @Html.DisplayName("Created By")
+        </th>
+        <th>
+            @Html.DisplayName("End Date")
+        </th>
+        <th></th>
+    </tr>
+    </thead>
+    <tfoot>
+    <tr>
+        <td>
+            @for (int i = 1; i <= Model.NumberOfPages; i++)
+            {
+                if (i != Model.CurrentPage)
+                {
+                    <a class="page-number" href="#" id="@i">@i</a>
+                }
+                else
+                {
+                    <span><b>@i</b></span>
+                }
+            }
+        </td>
+    </tr>
+    </tfoot>
+    <tbody>
+        @foreach (var item in Model.Data)
+        {
+            <tr>
+                <td>
+                    <img src="@Url.Action("GetImage", "Lot", new {lotId = item.Id, isPreview = true})" />
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.ActionLink(item.CreatedByUser.DisplayName, "Details", new { id = item.CreatedByUser.Id, controller = "Users" })
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.EndDate)
+                </td>
+                <td>
+                    @Html.ActionLink("Details", "Details", new { id = item.Id })
+                    @if (ViewBag.IsAdminOrModerator)
+                {
+                        @Html.ActionLink("Update", "Update", new { id = item.Id })
+                        @Html.Raw(" ")
+                        @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                    }
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

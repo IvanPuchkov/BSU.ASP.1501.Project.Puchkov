@@ -1,0 +1,55 @@
+﻿@model MVC.Models.CustomPagerViewModel<MVC.Models.LotViewModel>
+<table class="table">
+    <thead>
+    <tr>
+        <th>
+            @Html.DisplayName("Lot Name")
+        </th>
+        <th>
+            @Html.DisplayName("Lot end date")
+        </th>
+        <th>
+            @Html.DisplayName("Still Active")
+        </th>
+
+
+        <th></th>
+    </tr>
+    </thead>
+    <tfoot>
+    <tr>
+        <td>
+            @for (int i = 1; i <= Model.NumberOfPages; i++)
+            {
+                if (i != Model.CurrentPage)
+                {
+                    @Ajax.ActionLink(i.ToString() + ' ',"GetLots","Users", new {id = ViewBag.Id, page = i}, new AjaxOptions() {UpdateTargetId = "additional-info" });
+                }
+                else
+                {
+                    <span><b>@i</b></span>
+                }
+            }
+        </td>
+    </tr>
+    </tfoot>
+    <tbody>
+        @foreach (var lot in Model.Data)
+        {
+            <tr>
+                <td>
+                    @Html.ActionLink(lot.Name, "Details", new { id = lot.Id, controller = "Lot" })
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => lot.EndDate)
+                </td>
+                <td>
+                    @(lot.LotClosed || lot.LotEnded ? "No" : "Yes")
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+

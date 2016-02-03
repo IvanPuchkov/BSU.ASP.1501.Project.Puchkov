@@ -53,7 +53,7 @@ namespace DAL.Concrete
         {
             var ormLot = _context.Set<Lot>().FirstOrDefault(lot => lot.Id == key);
 
-            return ormLot.ToDalLot();
+            return ormLot?.ToDalLot();
         }
 
         public void Create(DalLot e)
@@ -88,7 +88,7 @@ namespace DAL.Concrete
 
         public IEnumerable<DalLot> GetAllLotsCreatedByUser(int userId)
         {
-            return  _context.Set<Lot>().Where(x => x.CreatedByUserId == userId).Select(x => x.ToDalLot());
+            return  _context.Set<Lot>().Where(x => x.CreatedByUserId == userId).ToEnumerable().Select(x => x.ToDalLot());
         }
 
         public IEnumerable<DalLot> GetLotsContainingStringInName(string s)

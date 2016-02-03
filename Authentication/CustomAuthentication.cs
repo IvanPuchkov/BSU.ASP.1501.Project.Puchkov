@@ -37,7 +37,7 @@ namespace Authentication
             var authCookie = new HttpCookie(CookieName)
             {
                 Value = encTicket,
-                Expires = DateTime.Now.Add(FormsAuthentication.Timeout)
+                Expires = DateTime.Now.AddDays(1)
             };
             context.Response.Cookies.Set(authCookie);
         }
@@ -53,22 +53,22 @@ namespace Authentication
 
 
 
-        public bool LoginWithDisplayName(HttpContext context, string displayName, string password)
+        public bool LoginWithDisplayName(HttpContext context, string displayName, string password, bool isPersistent)
         {
             UserEntity user = _userService.GetUserEntityByDisplayNameAndPassword(displayName, password);
             if (user == null)
                 return false;
-            CreateCookie(context, user);
+            CreateCookie(context, user,isPersistent);
             return true;
         }
 
 
-        public bool LoginWithEmail(HttpContext context, string email, string password)
+        public bool LoginWithEmail(HttpContext context, string email, string password, bool isPersistent)
         {
             UserEntity user = _userService.GetUserEntityByEmailAndPassword(email, password);
             if (user == null)
                 return false;
-            CreateCookie(context, user);
+            CreateCookie(context, user,isPersistent);
             return true;
         }
 

@@ -2,7 +2,24 @@
 @{
     ViewBag.Title = "Details";
 }
+<script type="text/javascript">
+    
+    /*$.fn.error=function(xhr, status, error) {
+        var err = eval("(" + xhr.responseText + ")");
+        alert(err.Message);
+    }*/
+    function failure(xhr, status, error) {
+        $('#message').css('color', 'red');
+        $('#message').text(error);
+    };
 
+    function success() {
+        $('#message').css('color', 'green');
+        $('#message').text('Your bid has been successfully placed');
+    }
+    
+
+</script>
 <h2>@Model.Name</h2>
 @if ((!Model.LotClosed) && (!Model.LotEnded))
 {
@@ -89,21 +106,32 @@ else
             <dd>
                 @Html.DisplayFor(model => model.EndDate)
             </dd>
-            @if ((!ViewBag.SamePerson) && (ViewBag.AutorizedAndNotBanned)&& (!Model.LotClosed)&&(!Model.LotEnded))
-            {
-                <dt>
-                    Place Bid
-                </dt>
-                <dd>
-                    @Html.ActionLink("Place Bid", "Create", new { Id = Model.Id, controller = "Bid" })
-                </dd>
-            }
+
         </dl>
     </div>
 </div>
+<div id="message"></div>
+@if ((!ViewBag.SamePerson) && (ViewBag.AutorizedAndNotBanned) && (!Model.LotClosed) && (!Model.LotEnded))
+{
+    <h5>Place bid</h5>
+    
+    using (Ajax.BeginForm("Create", "Bid", new AjaxOptions() { HttpMethod = "Post", OnFailure = "failure",OnSuccess = "success"}))
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="lotId" value="@Model.Id" />
+        <span>Amount</span>
+        <br />
+        @Html.TextBox("Amount")
+        <br />
+        <input type="submit" value="Submit" />
+    }
+}
+
+<br/>
+<br/>
 @if (ViewBag.TopBid > 0m)
 {
-    @Html.DisplayName("Latest bids")
+    <h6>Latest bids</h6>
     <table class="table">
         <tr>
             <th>
@@ -120,9 +148,9 @@ else
 
         @foreach (var item in Model.LatestBids)
         {
-            <tr>
+            <tr id="@item.Id">
                 <td>
-                    @Html.ActionLink(item.User.DisplayName, "Details", new { userId = item.User.Id, controller = "Users" })
+                    @Html.ActionLink(item.User.DisplayName, "Details", new { id = item.User.Id, controller = "Users" })
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Amount)
@@ -133,7 +161,7 @@ else
                 <td>
                     @if (ViewBag.IsAdminOrModerator&&(!(Model.LotClosed||Model.LotEnded)))
                     {
-                        @Html.ActionLink("Delete", "Delete", new { id = item.Id, controller="Bid" })
+                        @Ajax.ActionLink("Remove", "Delete", "Bid", new {id = item.Id}, new AjaxOptions() {Confirm = "Are you sure you want to delete this bid? (This action is irreversible!)", OnSuccess = "RemoveRowById('" + item.Id + "')"})
                     }
                 </td>
             </tr>
@@ -141,4 +169,6 @@ else
 
     </table>
 }
-
+@Scripts.Render("~/scripts/jquery-1.10.2.min")
+@Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
+@Scripts.Render("~/scripts/CustomRowRemover.js")

@@ -19,7 +19,7 @@ namespace MVC.Controllers
         private readonly ILotService _lotService;
         private readonly IBidService _bidService;
         private readonly ICustomAuthentication _customAuthentication;
-
+        private const int ItemsPerPage = 3;
         public LotController(ICustomAuthentication authentication, ILotService lotService,IBidService bidService) : base(authentication)
         {
             _customAuthentication = authentication;
@@ -59,6 +59,41 @@ namespace MVC.Controllers
             return View(lotVM);
         }
 
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public ActionResult LotList(int? page,LotSearchViewModel search)
+        {
+            int actualPage = page ?? 1;
+            ViewBag.IsAdminOrModerator = false;
+            IEnumerable<LotEntity> lots;
+            if ((UserViewModel != null))
+            {
+                ViewBag.IsAdminOrModerator = _customAuthentication.CheckUserInRoles(UserViewModel.ToUserEntity(),
+                    "Admin,Moderator");
+            }
+            if (string.IsNullOrEmpty(search?.SearchString))
+            {
+                lots= _lotService.GetAllLots();
+            }
+            else
+            {
+                if (search.SearchInName)
+                    lots = _lotService.GetLotsContainingStringInName(search.SearchString);
+                else
+                {
+                    lots = _lotService.GetLotsContainingStringInDescription(search.SearchString);
+                }
+            }
+            var pager=new CustomPagerViewModel<LotViewModel>();
+            pager.CurrentPage = actualPage;
+            int count = lots.Count();
+            int numberOfPages = count/ItemsPerPage;
+            pager.NumberOfPages = count%ItemsPerPage==0?numberOfPages:numberOfPages+1;
+            pager.Data=lots.Skip((actualPage - 1) * ItemsPerPage).Take(ItemsPerPage).Select(x => x.ToLotViewModel());
+            ViewBag.SearchString = search?.SearchString;
+            ViewBag.SearchInName = search?.SearchInName ?? true;
+            return PartialView(pager);
+        }
+
         public ActionResult Index()
         {
             ViewBag.IsAdminOrModerator = false;
@@ -70,35 +105,10 @@ namespace MVC.Controllers
                 ViewBag.IsAdminOrModerator = _customAuthentication.CheckUserInRoles(UserViewModel.ToUserEntity(),
                     "Admin,Moderator");
             }
-            ViewBag.Content = _lotService.GetAllLots().Select(x => x.ToLotViewModel());
-            return View(new LotViewModel());
+            return View(new LotSearchViewModel());
         }
 
-        [HttpPost]
-        public ActionResult Index(LotViewModel lot)
-        {
-            if (string.IsNullOrEmpty(lot.SearchString))
-                return RedirectToAction("Index");
-            ViewBag.IsAdminOrModerator = false;
-            if ((UserViewModel == null) || (UserViewModel.Banned))
-                ViewBag.AutorizedAndNotBanned = false;
-            else
-            {
-                ViewBag.AutorizedAndNotBanned = true;
-                ViewBag.IsAdminOrModerator = _customAuthentication.CheckUserInRoles(UserViewModel.ToUserEntity(),
-                    "Admin,Moderator");
-            }
-
-            IEnumerable<LotEntity> lots;
-            if (lot.SearchInName)
-                lots = _lotService.GetLotsContainingStringInName(lot.SearchString);
-            else
-            {
-                lots = _lotService.GetLotsContainingStringInDescription(lot.SearchString);
-            }
-            ViewBag.Content = lots.Select(x => x.ToLotViewModel());
-            return View(lot);
-        }
+        
 
         private WebImage GetDefaultImage(bool isPreview)
         {

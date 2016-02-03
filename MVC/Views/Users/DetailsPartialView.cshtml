@@ -1,0 +1,33 @@
+﻿@model MVC.Models.UserViewModel
+<div id="content">
+    @if (Model.Banned)
+    {
+        <h2 style="color: red">User @Model.DisplayName</h2>
+        if (ViewBag.AdminOrModerator)
+        {
+            @Ajax.ActionLink("Unban user", "Ban", "Users", new { id = Model.Id, ban = false }, new AjaxOptions() { UpdateTargetId = "content" })
+        }
+    }
+    else
+    {
+        <h2>User @Model.DisplayName</h2>
+        if (ViewBag.AdminOrModerator)
+        {
+            @Ajax.ActionLink("Ban user", "Ban", "Users", new { id = Model.Id, ban = true },
+             new AjaxOptions()
+             {
+                 UpdateTargetId = "content",
+                 Confirm = "Are you sure you want to ban this user? All active lots mde by this user will be closed and all active bids will be deleted"
+             })
+        }
+    }
+    <div id="Actions">
+        @Ajax.ActionLink("All lots made by user", "GetLots", new { id = Model.Id },
+            new AjaxOptions { UpdateTargetId = "additional-info" })
+        <br />
+        @Ajax.ActionLink("All bids made by user", "GetBids", new { id = Model.Id },
+            new AjaxOptions { UpdateTargetId = "additional-info" })
+    </div>
+    <div id="additional-info">
+    </div>
+</div>

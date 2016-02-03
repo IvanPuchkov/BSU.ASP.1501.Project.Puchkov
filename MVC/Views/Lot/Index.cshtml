@@ -1,79 +1,60 @@
-﻿@using MVC.Models
-@model MVC.Models.LotViewModel
+﻿@model MVC.Models.LotSearchViewModel
 @{
     ViewBag.Title = "Index";
 }
+<script>
+    function SaveSearchRequest() {
+        window.SearchStringVariable = document.getElementById('SearchString').value;
+        window.SearchInNameVariable = document.getElementById('SearchInName').checked;
+    }
+    
+</script>
+<script type="text/javascript">
+    
+    $(document).on("click", ".page-number", function () {
+            
+        var page = parseInt($(this).html());
+        
+        if (window.SearchStringVariable === undefined)
+        { window.SearchStringVariable = ""; }
+        if (window.SearchInNameVariable === undefined)
+            window.SearchInNameVariable = true;
 
+                    $.ajax({
+                type: 'POST',
+                async:true,
+                url: '@Url.Action("LotList")',
+                data: 'page=' + page + '&SearchString=' + SearchStringVariable + '&SearchInName=' + SearchInNameVariable,
+                datatype: "html",
+                success: function (data) {
+                    $("#content").html(data);
+                }
+            });
+        });
+    
+</script>
 @if (ViewBag.AutorizedAndNotBanned)
 {
     @Html.ActionLink("Crete new Lot", "Create")
 }
-
-@using (Html.BeginForm("Index","Lot", FormMethod.Post, new {@class = "form-horizontal", role = "form"}))
-{
-    @Html.DisplayName("Search");
-    <br/>
-    @Html.LabelFor(x=>x.SearchString, new { @class = "col-md-2 control-label" })
-    @Html.TextBoxFor(y=>y.SearchString)
-    <br/>
-    <span>@Html.RadioButtonFor(x => x.SearchInName, "true")Search in name</span>
-    <span>@Html.RadioButtonFor(x => x.SearchInName, "false")Search in description</span>
-    <input type="submit" value="Submit" />
+@{
+    using (Ajax.BeginForm("LotList", new AjaxOptions() { UpdateTargetId = "content", HttpMethod = "Post", OnBegin = "SaveSearchRequest()"}))
+    {
+        <br />
+        @Html.LabelFor(x => x.SearchString)
+        <br />
+        @Html.TextBoxFor(y => y.SearchString,new {id="SearchString"})
+        <br />
+        <span>@Html.RadioButtonFor(x => x.SearchInName, "true",new {id="SearchInName"})Search in name</span>
+        <span>@Html.RadioButtonFor(x => x.SearchInName, "false")Search in description</span>
+        <br />
+        <input type="submit" value="Submit" />
+    }
 }
 
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayName("Lot Preview Image")
-        </th>
-        <th>
-            @Html.DisplayName("Lot Id")
-        </th>
-        <th>
-            @Html.DisplayName("Lot Name")
-        </th>
-        
-        <th>
-            @Html.DisplayName("Created By")
-        </th>
-        <th>
-            @Html.DisplayName("End Date")
-        </th>
-        <th></th>
-    </tr>
+<div id="content">
+    @Html.Action("LotList",new {page=1})
+</div>
 
-    @foreach (var item in (ViewBag.Content as IEnumerable<LotViewModel>))
-    {
-        <tr>
-            <td>
-                <img src="@Url.Action("GetImage", "Lot", new {lotId = item.Id, isPreview = true})"/>
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedByUser.DisplayName)
-            </td>
-
-            <td>
-                @Html.DisplayFor(modelItem => item.EndDate)
-            </td>
-            <td>
-                @Html.ActionLink("Details", "Details", new {id = item.Id})
-                @if (ViewBag.IsAdminOrModerator)
-                {
-                     @Html.ActionLink("Update", "Update", new {id = item.Id})
-                     @Html.Raw(" ")
-                     @Html.ActionLink("Delete", "Delete", new {id = item.Id})
-                }
-                
-            </td>
-        </tr>
-    }
-
-</table>
-
-
+@Scripts.Render("~/scripts/jquery-1.10.2.min.js")
+@Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
